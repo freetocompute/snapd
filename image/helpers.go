@@ -131,7 +131,7 @@ func snapcraftLoginSection() string {
 	if snapdenv.UseStagingStore() {
 		return "login.staging.ubuntu.com"
 	}
-	return "login.ubuntu.com"
+	return "{{LOGIN_URL}}"
 }
 
 func parseSnapcraftLoginFile(authFn string, data []byte) (*authData, error) {

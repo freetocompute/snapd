@@ -51,7 +51,7 @@ func baseURL() *url.URL {
 	if snapdenv.UseStagingStore() {
 		return mustParse("https://api.staging.snapcraft.io/")
 	}
-	return mustParse("https://api.snapcraft.io/")
+	return mustParse("{{SYSTEM_DEFAULT_BASE_URL}}")
 }
 
 func mustParse(s string) *url.URL {

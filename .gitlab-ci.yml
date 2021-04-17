@@ -1,0 +1,87 @@
+image: golang:1.10.8
+
+stages:
+  - build
+  - package
+
+.get_mo: &get_mo
+  - curl -sSL https://git.io/get-mo -o mo
+  - chmod +x mo
+  - mv mo /usr/local/bin/
+
+.process_templates: &process_templates
+  - export TMPMODIR=`mktemp -d`
+  - cat store/store.go | mo > ${TMPMODIR}/store.go
+  - mv ${TMPMODIR}/store.go store/store.go
+  - cat cmd/snap-repair/cmd_run.go | mo > ${TMPMODIR}/cmd_run.go
+  - mv ${TMPMODIR}/cmd_run.go cmd/snap-repair/cmd_run.go
+  - cat overlord/devicestate/handlers_serial.go | mo > ${TMPMODIR}/handlers_serial.go
+  - mv ${TMPMODIR}/handlers_serial.go overlord/devicestate/handlers_serial.go
+  - cat asserts/sysdb/generic.go | mo > ${TMPMODIR}/generic.go
+  - mv ${TMPMODIR}/generic.go asserts/sysdb/generic.go
+  - cat asserts/sysdb/generic.go
+  - cat asserts/sysdb/trusted.go | mo > ${TMPMODIR}/trusted.go
+  - mv ${TMPMODIR}/trusted.go asserts/sysdb/trusted.go
+  - cat asserts/sysdb/trusted.go
+  - rm -rf ${TMPMODIR}
+
+.setup: &setup
+  - mkdir -p /go/src/github.com/snapcore /go/src/_/builds
+  - cp -r $CI_PROJECT_DIR /go/src/github.com/snapcore
+  - ln -s /go/src/github.com/snapcore /go/src/_/builds/snapcore
+  - cd /go/src/github.com/snapcore/snapd
+  - ./get-deps.sh
+
+build:
+  stage: build
+  tags:
+    - docker
+  before_script:
+    - *get_mo
+    - *process_templates
+    - *setup
+
+  script:
+    - mkdir $CI_PROJECT_DIR/output
+    - GO111MODULE=off go build -o $CI_PROJECT_DIR/output/snapd cmd/snapd/main.go
+    - cd cmd/snap && GO111MODULE=off go build -o $CI_PROJECT_DIR/output/snap .
+
+  artifacts:
+    name: binaries
+    paths:
+      - output
+
+build-snap:
+  stage: build
+  tags:
+    - shell-lxd
+  before_script:
+  - *process_templates
+  script:
+    - snapcraft clean --use-lxd
+    - snapcraft --use-lxd
+  artifacts:
+    name: snapd snap
+    paths:
+      - snapd*.snap
+
+package-linux-mint-package:
+  stage: package
+  image: ubuntu:20.04
+  tags:
+    - docker
+  variables:
+    SNAPD_VERSION: "2.48.3+20.04"
+  dependencies:
+    - build
+  script:
+   - apt update && apt install -y wget && wget http://security.ubuntu.com/ubuntu/pool/main/s/snapd/snapd_${SNAPD_VERSION}_amd64.deb
+   - mkdir debian-dir
+   - dpkg-deb -R ./snapd_${SNAPD_VERSION}_amd64.deb debian-dir
+   - mv output/snapd debian-dir/usr/lib/snapd/snapd
+   - mv output/snap debian-dir/usr/bin/snap
+   - dpkg-deb -b debian-dir snapd_${SNAPD_VERSION}_custom_amd64.deb
+  artifacts:
+    name: package
+    paths:
+      - snapd*.deb

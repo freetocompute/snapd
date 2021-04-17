@@ -27,6 +27,10 @@ import (
 )
 
 const (
+	encodedAdditionalTrustedAccount = `{{ADDITIONAL_TRUSTED_ACCOUNT_ASSERTION}}
+`
+	encodedAdditionalTrustedAccountKey = `{{ADDITIONAL_TRUSTED_ACCOUNT_KEY_ASSERTION}}
+`
 	encodedCanonicalAccount = `type: account
 authority-id: canonical
 account-id: canonical
@@ -124,7 +128,18 @@ func init() {
 	if err != nil {
 		panic(fmt.Sprintf("cannot decode trusted assertion: %v", err))
 	}
-	trustedAssertions = []asserts.Assertion{canonicalAccount, canonicalRootAccountKey}
+
+	kebeAccount, err := asserts.Decode([]byte(encodedAdditionalTrustedAccount))
+	if err != nil {
+		panic(fmt.Sprintf("cannot decode trusted assertion: %v", err))
+	}
+	kebeRootAccountKey, err := asserts.Decode([]byte(encodedAdditionalTrustedAccountKey))
+
+	if err != nil {
+		panic(fmt.Sprintf("cannot decode trusted assertion: %v", err))
+	}
+
+	trustedAssertions = []asserts.Assertion{canonicalAccount, canonicalRootAccountKey, kebeAccount, kebeRootAccountKey}
 }
 
 // Trusted returns a copy of the current set of trusted assertions as used by Open.

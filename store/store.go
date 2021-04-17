@@ -210,7 +210,7 @@ func endpointURL(base *url.URL, path string, query url.Values) *url.URL {
 
 // apiURL returns the system default base API URL.
 func apiURL() *url.URL {
-	s := "https://api.snapcraft.io/"
+	s := "{{SYSTEM_DEFAULT_BASE_URL}}/"
 	if snapdenv.UseStagingStore() {
 		s = "https://api.staging.snapcraft.io/"
 	}
@@ -261,17 +261,19 @@ func authLocation() string {
 	if snapdenv.UseStagingStore() {
 		return "login.staging.ubuntu.com"
 	}
-	return "login.ubuntu.com"
+	return "{{LOGIN_FQDN}}"
 }
 
 func authURL() string {
 	if u := os.Getenv("SNAPPY_FORCE_SSO_URL"); u != "" {
 		return u
 	}
-	return "https://" + authLocation() + "/api/v2"
+	// return "https://" + authLocation() + "/api/v2"
+
+	return "http://" + authLocation() + ":{{LOGIN_PORT}}" + "/api/v2"
 }
 
-var defaultStoreDeveloperURL = "https://dashboard.snapcraft.io/"
+var defaultStoreDeveloperURL = "{{DEFAULT_STORE_DEVELOPER_URL}}/"
 
 func storeDeveloperURL() string {
 	if snapdenv.UseStagingStore() {

@@ -51,7 +51,7 @@ func init() {
 	if snapdenv.UseStagingStore() {
 		baseurl = "https://api.staging.snapcraft.io/v2/"
 	} else {
-		baseurl = "https://api.snapcraft.io/v2/"
+		baseurl = "{{SYSTEM_DEFAULT_BASE_URL}}/v2/"
 	}
 
 	var err error

@@ -1,3 +1,42 @@
+# Notes about this branch
+
+This branch uses Mustache template processing to replace URLs with environment variables / values
+at build time.
+
+## Current
+
+### ADDITIONAL_TRUSTED_ACCOUNT_ASSERTION
+This is a signed account assertion using the private key of the new trusted account.
+
+### ADDITIONAL_TRUSTED_ACCOUNT_KEY_ASSERTION
+This is the account key assertion signed with the private key of the new trusted account.
+
+### DEFAULT_STORE_DEVELOPER_URL
+This is the store developer URL
+
+### GENERIC_ACCOUNT_ASSERTION
+This is a new generic account assertion replacing the existing one that is signed by the
+new trusted account.
+
+### GENERIC_ACCOUNT_KEY_ASSERTION
+This is a new generic account-key assertion replacing the existing one that is signed by the
+new trusted account.
+
+### LOGIN_FQDN
+This is the login fully qualified domain name without protocol scheme or port.
+
+### LOGIN_PORT
+This is the port to use with the login FQDN. Presently it is required and the 
+protocol scheme is http.
+
+### SYSTEM_DEFAULT_BASE_URL
+This is the main "store" api URL for all non-login or developer requests.
+
+
+
+
+# ORIGINAL 
+
 [![Snapcraft](https://avatars2.githubusercontent.com/u/19532717?s=200)](https://snapcraft.io)
 
 # Welcome to snapd
