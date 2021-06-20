@@ -1,5 +1,7 @@
 # Notes about this branch
 
+**USE AT YOUR OWN RISK**
+
 This branch uses Mustache template processing to replace URLs with environment variables / values
 at build time.
 
@@ -32,7 +34,16 @@ protocol scheme is http.
 ### SYSTEM_DEFAULT_BASE_URL
 This is the main "store" api URL for all non-login or developer requests.
 
+## CI Example
 
+A current, if not brutish, CI example is included. The variables are supplied as part
+of the pipeline setup. 
+
+For a test system (Linux Mint 20.1 makes a great target since it ships without any previous snapd parts) I just
+take the existing package and replace the binaries I want.
+
+
+[Gitlab CI](.gitlab-ci.yml)
 
 
 # ORIGINAL 
